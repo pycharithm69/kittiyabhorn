@@ -1,0 +1,155 @@
+    
+    <script type="text/javascript">
+
+        var $buoop = { c: 2 };
+        function $buo_f() {
+            var e = document.createElement("script");
+            e.src = "//browser-update.org/update.min.js";
+            document.body.appendChild(e);
+        };
+        try { document.addEventListener("DOMContentLoaded", $buo_f, false) }
+        catch (e) { window.attachEvent("onload", $buo_f) }
+
+    </script>
+
+</body>
+</html>
+
+<script type="text/javascript">
+    $(function () {
+
+        //Time
+        var date = moment("2020-09-14 10:33:18");
+        date.locale('en');
+        var formatString = "dddd MMMM DD, YYYY HH:mm:ss";
+        if ($('html').attr('lang') == 'zh') {
+            formatString = "HH:mm:ss, dddd DD, MMMM YYYY";
+        }
+        if ($('html').attr('lang') == 'zh') {
+            date.locale('zh-cn');
+        }
+        else if ($('html').attr('lang') == 'ms') {
+            formatString = "dddd, D MMMM YYYY HH:mm:ss";
+            date.locale('ms');
+        }
+        else if ($('html').attr('lang') == 'id') {
+            formatString = "dddd, D MMMM YYYY HH:mm:ss";
+            date.locale('id');
+        }
+
+        function date_time(id, time) {
+            date = date.add("seconds", time / 1000);
+
+            document.getElementById(id).innerHTML = date.format(formatString);
+
+            setTimeout(function () {
+                date_time(id, time);
+            }, time);
+            return true;
+        }
+
+        date_time('time', 1000);
+
+
+        //QRCode
+        $('.android-qr-code').attr('src', '/WebQRCode');
+        $('.ios-qr-code').attr('src', '/WebQRCode');
+        $('.allbet-qr-code').attr('src', '/WebQRCode?publisher=allbet');
+        $('.wechat-qr-code').attr('src', '/WebQRCode?publisher=wechat');
+        $('.android-qr-code,.ios-qr-code,.allbet-qr-code,.wechat-qr-code').show();
+        magnificPopup($('.android-qr-code.img-qr-code'), { type: 'image' });
+        magnificPopup($('.ios-qr-code.img-qr-code'), { type: 'image' });
+        magnificPopup($('.allbet-qr-code.img-qr-code'), { type: 'image' });
+        magnificPopup($('.wechat-qr-code.img-qr-code'), { type: 'image' });
+
+        //Logout
+        window.logoutURL = '/Logout';
+
+        $(".toogle-popup").on("click", function () {
+            var $self = $(this);
+            var url = $self.data("url-view");
+            var modalName = $self.data("modal-name");
+
+            var callBackFn = function ($spinner) {
+                if (modalName == 'nickname') {
+                    NicknameModalBinding();
+                }
+                else if (modalName == 'password') {
+                    PasswordModalBinding($self.data('username'));
+                    $spinner.hide();
+                }
+            };
+
+            createPopup($("#user-popup"), url, null, callBackFn);
+        });
+
+        $("#user-popup").on("click", '.user-modal-close', function () {
+            var $modal = $(this).parents(".user-modal");
+            hidePopup($modal, true);
+        });
+
+        $("#message-popup-container").on("click", '.user-modal-close', function () {
+            var $modal = $(this).parents(".user-modal");
+            hidePopup($modal, false);
+        });
+
+        if (window.isSignedIn) {
+            createTournamentPopup($('#tournament-popup'));
+        }
+
+        $('.popup-content').magnificPopup({
+            removalDelay: 500,
+            modal: true,
+            preloader: true,
+            overflowY: 'hidden',
+            callbacks: {
+                beforeOpen: function () {
+                    this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+                    this.st.mainClass = this.st.el.attr('data-effect');
+                }
+            },
+            fixedBgPos: true
+        });
+
+        $('.popup-close').on("click", function () {
+            $.magnificPopup.close();
+        });
+
+        $('.tac-owl-carousel').owlCarousel({
+            navigation: true,
+            slideSpeed: 300,
+            paginationSpeed: 400,
+            singleItem: true,
+            navigationText: [
+               '<img src="/Themes/Joker/Images/arrow_left.png" alt="title" />',
+               '<img src="/Themes/Joker/Images/arrow_right.png" alt="title" />'
+            ]
+        });
+    });
+
+    $('.btn-banner-play').on('click', function (event) {
+        var $self = $(this);
+        var gameCode = $self.data("game-code");
+        var gamePage = $self.data("game-page");
+        var authenticated = 'False';
+        window.authenticated = authenticated.toLowerCase();
+
+        if (authenticated.toLowerCase() === 'true') {
+            if (gamePage == "LiveCasino") {
+
+                var $container = $self.hasClass(".item") ? $self : $self.parents(".item");
+                playLiveCasino(gameCode, $container);
+                return;
+            } else if (gamePage == "GameIndex") {
+                window.fnGameURL = function (game) {
+                    var url = '/Game';
+                    url += (url.indexOf('?') >= 0 ? '&' : '?') + 'game=' + game;
+                    return url;
+                }
+            }
+        }
+        else {
+            popupLogin(gamePage, gameCode);
+        }
+    });
+</script>
